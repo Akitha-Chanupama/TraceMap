@@ -56,15 +56,21 @@ class FileFilter:
             return True
         
         # Check hidden or secret files
-        if file_path.name.startswith(".env") or file_path.name.endswith(".key") or file_path.name.endswith(".pem"):
+        secret_names = {"id_rsa", "id_dsa", "id_ecdsa", "id_ed25519"}
+        if (
+            file_path.name in secret_names
+            or file_path.name.startswith(".env")
+            or file_path.name.endswith((".key", ".pem", ".p12", ".pfx", ".cert", ".crt"))
+        ):
             return True
 
-        # Check file size
-        try:
-            if file_path.stat().st_size > self.max_file_size:
-                return True
-        except OSError:
-            return True
+        # Check file size if file exists on disk
+        if file_path.exists():
+            try:
+                if file_path.stat().st_size > self.max_file_size:
+                    return True
+            except OSError:
+                pass
 
         # Check gitignore patterns
         norm_rel = rel_path.replace("\\", "/")

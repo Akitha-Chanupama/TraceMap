@@ -2,7 +2,7 @@ import math
 from typing import List, Dict, Any
 
 
-def compute_grid_layout(nodes: List[Dict[str, Any]], cols: int = 5, spacing_x: int = 320, spacing_y: int = 160):
+def compute_grid_layout(nodes: List[Dict[str, Any]], cols: int = 5, spacing_x: int = 320, spacing_y: int = 160) -> List[Dict[str, Any]]:
     """Simple clean grid layout fallback for node positions."""
     for i, node in enumerate(nodes):
         row = i // cols
@@ -11,17 +11,18 @@ def compute_grid_layout(nodes: List[Dict[str, Any]], cols: int = 5, spacing_x: i
             "x": float(col * spacing_x),
             "y": float(row * spacing_y),
         }
+    return nodes
 
 
-def compute_radial_layout(nodes: List[Dict[str, Any]], center_x: float = 600.0, center_y: float = 400.0, radius_step: float = 250.0):
+def compute_radial_layout(nodes: List[Dict[str, Any]], center_x: float = 600.0, center_y: float = 400.0, radius_step: float = 250.0) -> List[Dict[str, Any]]:
     """Distributes nodes in concentric circles."""
     if not nodes:
-        return
+        return nodes
 
     nodes[0]["position"] = {"x": center_x, "y": center_y}
     remaining = nodes[1:]
     if not remaining:
-        return
+        return nodes
 
     layer = 1
     idx = 0
@@ -36,9 +37,10 @@ def compute_radial_layout(nodes: List[Dict[str, Any]], center_x: float = 600.0, 
             }
         idx += count_in_layer
         layer += 1
+    return nodes
 
 
-def compute_clustered_directory_layout(nodes: List[Dict[str, Any]]):
+def compute_clustered_directory_layout(nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Clusters nodes by directory folder."""
     clusters: Dict[str, List[Dict[str, Any]]] = {}
     for node in nodes:
@@ -57,3 +59,4 @@ def compute_clustered_directory_layout(nodes: List[Dict[str, Any]]):
             n["position"]["x"] += curr_x
         max_x = max((n["position"]["x"] for n in cluster_nodes), default=0.0)
         curr_x = max_x + 360.0
+    return nodes

@@ -182,10 +182,10 @@ class GraphBuilder:
         )
 
     def build_symbol_explorer_graph(self, max_symbols: int = 300) -> GraphDataResponse:
-        """Visualizes classes, interfaces, components, and functions."""
+        """Visualizes classes, interfaces, components, methods, and functions."""
         filtered_symbols = [
             s for s in self.symbols
-            if s.get("symbol_type") in ("class", "interface", "component", "function")
+            if s.get("symbol_type") in ("class", "interface", "component", "function", "method", "enum")
         ][:max_symbols]
 
         sym_by_id = {s["id"]: s for s in filtered_symbols}
@@ -291,3 +291,7 @@ class GraphBuilder:
             edges=[GraphEdge(**e) for e in edges],
             stats={"total_nodes": len(nodes), "total_edges": len(edges)},
         )
+
+    # Alias for external dependencies graph
+    build_dependency_graph = build_external_dependencies_graph
+
