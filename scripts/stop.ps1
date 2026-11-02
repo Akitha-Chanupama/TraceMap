@@ -13,7 +13,7 @@ if (Test-Path $pidFile) {
             $procId = [int]$p.Trim()
             try {
                 Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
-                Write-Host "  ✓ Terminated PID $procId" -ForegroundColor Gray
+                Write-Host ("  [+] Terminated PID " + $procId) -ForegroundColor Gray
             } catch {
                 # Already stopped
             }
@@ -23,9 +23,8 @@ if (Test-Path $pidFile) {
 }
 
 # Also cleanup any stray uvicorn or vite processes if needed
-Get-Process -Name "python", "node" | Where-Object {
+Get-Process -Name "python", "node" -ErrorAction SilentlyContinue | Where-Object {
     $_.MainWindowTitle -like "*uvicorn*" -or $_.CommandLine -like "*vite*"
 } | Stop-Process -Force -ErrorAction SilentlyContinue
 
 Write-Host "TraceMap stopped successfully." -ForegroundColor Green
-
