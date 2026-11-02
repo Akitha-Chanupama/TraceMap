@@ -47,7 +47,7 @@
 - [x] WebSocket real-time progress & status event streaming
 
 ## Milestone 8: Quality & Delivery
-- [x] Unit & integration tests for parsers, resolvers, graph algorithms, and APIs (12/12 passing)
+- [x] Unit & integration tests for parsers, resolvers, graph algorithms, APIs, and UI stores (21/21 backend pytest tests, 8/8 frontend vitest tests passing)
 - [x] Test fixtures with realistic code repositories (including deliberate circular dependencies in `fixtures/sample_repo`)
 - [x] Windows PowerShell scripts (`setup.ps1`, `start.ps1`, `stop.ps1`) & Unix shell scripts
 - [x] Complete documentation (`ARCHITECTURE.md`, `SUPPORTED_LANGUAGES.md`, `API.md`, `SECURITY.md`, `README.md`)
