@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import { X, FileCode, Layers, Code, Hash, AlertCircle, Loader2 } from 'lucide-react';
-import { useUiStore } from '../../stores/uiStore';
+import { useUiStore, FONT_SIZE_CONFIG } from '../../stores/uiStore';
 import { useProjectStore } from '../../stores/projectStore';
 import { fileApi } from '../../services/fileApi';
 import { SourceCodeResponse } from '../../types/file';
 
 export const SourceViewer: React.FC = () => {
-  const { activeInspectorFileId, sourceViewerOpen, closeSourceViewer } = useUiStore();
+  const { activeInspectorFileId, sourceViewerOpen, closeSourceViewer, fontSize, increaseFontSize, decreaseFontSize } = useUiStore();
   const { currentProject } = useProjectStore();
 
   const [sourceData, setSourceData] = useState<SourceCodeResponse | null>(null);
@@ -86,12 +86,36 @@ export const SourceViewer: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {sourceData && (
               <span className="text-[11px] text-text-muted font-mono">
                 {sourceData.line_count} lines
               </span>
             )}
+
+            {/* Code Font Size Adjuster */}
+            <div className="flex items-center bg-bg-panel border border-border-subtle rounded px-1.5 py-0.5 gap-1 text-[11px]">
+              <button
+                type="button"
+                onClick={decreaseFontSize}
+                title="Decrease Font Size"
+                className="px-1 hover:text-text-primary text-text-muted transition-colors font-medium"
+              >
+                A-
+              </button>
+              <span className="text-[10px] font-mono text-accent-cyan px-0.5">
+                {FONT_SIZE_CONFIG[fontSize]?.codePx}px
+              </span>
+              <button
+                type="button"
+                onClick={increaseFontSize}
+                title="Increase Font Size"
+                className="px-1 hover:text-text-primary text-text-muted transition-colors font-medium"
+              >
+                A+
+              </button>
+            </div>
+
             <button
               onClick={closeSourceViewer}
               className="p-1 rounded text-text-muted hover:text-text-primary hover:bg-bg-panel transition-colors"
@@ -126,7 +150,7 @@ export const SourceViewer: React.FC = () => {
                 options={{
                   readOnly: true,
                   minimap: { enabled: true },
-                  fontSize: 12,
+                  fontSize: FONT_SIZE_CONFIG[fontSize]?.codePx || 14,
                   fontFamily: "'Fira Code', Consolas, 'Courier New', monospace",
                   scrollBeyondLastLine: false,
                   automaticLayout: true,

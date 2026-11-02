@@ -4,12 +4,10 @@ import {
   RefreshCw,
   FolderOpen,
   Search,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
+  Type,
 } from 'lucide-react';
 import { useProjectStore } from '../../stores/projectStore';
-import { useUiStore } from '../../stores/uiStore';
+import { useUiStore, FONT_SIZE_CONFIG } from '../../stores/uiStore';
 import { projectApi } from '../../services/projectApi';
 
 interface TopbarProps {
@@ -18,8 +16,8 @@ interface TopbarProps {
 }
 
 export const Topbar: React.FC<TopbarProps> = ({ onOpenNewProject, onOpenSearch }) => {
-  const { currentProject, projectsList, setCurrentProject, setProjectsList } = useProjectStore();
-  const { toggleSidebar } = useUiStore();
+  const { currentProject, projectsList, setCurrentProject } = useProjectStore();
+  const { toggleSidebar, fontSize, increaseFontSize, decreaseFontSize } = useUiStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -80,7 +78,7 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenNewProject, onOpenSearch }
         </div>
       </div>
 
-      {/* Global Search and Actions */}
+      {/* Global Search, Font Size Selector, and Actions */}
       <div className="flex items-center gap-3">
         <button
           onClick={onOpenSearch}
@@ -94,6 +92,30 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenNewProject, onOpenSearch }
             /
           </kbd>
         </button>
+
+        {/* Font Size Quick Selector */}
+        <div className="flex items-center bg-bg-panel border border-border-subtle rounded-md px-1 py-0.5 gap-1 text-xs">
+          <button
+            type="button"
+            onClick={decreaseFontSize}
+            title="Decrease Font Size (A-)"
+            className="px-1.5 py-0.5 rounded text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors font-medium text-[11px]"
+          >
+            A-
+          </button>
+          <div className="flex items-center gap-1 px-1.5 py-0.5 text-[11px] font-medium text-accent-blue select-none">
+            <Type className="w-3 h-3 opacity-70" />
+            <span>{FONT_SIZE_CONFIG[fontSize]?.label.split(' ')[0]}</span>
+          </div>
+          <button
+            type="button"
+            onClick={increaseFontSize}
+            title="Increase Font Size (A+)"
+            className="px-1.5 py-0.5 rounded text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors font-medium text-[11px]"
+          >
+            A+
+          </button>
+        </div>
 
         {currentProject && (
           <button
@@ -109,4 +131,3 @@ export const Topbar: React.FC<TopbarProps> = ({ onOpenNewProject, onOpenSearch }
     </header>
   );
 };
-

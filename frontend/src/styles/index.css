@@ -7,6 +7,31 @@
     color-scheme: dark;
   }
 
+  html {
+    font-size: 16.5px;
+    transition: font-size 0.15s ease-out;
+  }
+
+  html[data-font-size="compact"] {
+    font-size: 13.5px;
+  }
+
+  html[data-font-size="normal"] {
+    font-size: 15px;
+  }
+
+  html[data-font-size="medium"] {
+    font-size: 16.5px;
+  }
+
+  html[data-font-size="large"] {
+    font-size: 18px;
+  }
+
+  html[data-font-size="xlarge"] {
+    font-size: 19.5px;
+  }
+
   body {
     background-color: #0B0D12;
     color: #E8EDF5;

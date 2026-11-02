@@ -94,3 +94,4 @@ def browse_directory(target_path: Optional[str] = None) -> Dict[str, Any]:
         "drives": drives,
         "quick_locations": quick_locations,
     }
+
