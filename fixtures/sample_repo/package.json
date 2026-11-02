@@ -1,0 +1,7 @@
+{
+  "name": "acceptance-sample-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^18.3.1"
+  }
+}
