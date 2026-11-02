@@ -15,6 +15,15 @@ export const projectApi = {
       method: 'POST',
     }),
 
+  browseFilesystem: (path?: string) =>
+    request<{
+      current_path: string;
+      parent_path: string | null;
+      directories: Array<{ name: string; path: string }>;
+      drives: string[];
+      quick_locations: Array<{ name: string; path: string }>;
+    }>(`/projects/browse-filesystem${path ? `?path=${encodeURIComponent(path)}` : ''}`),
+
   getProject: (projectId: string) => request<Project>(`/projects/${projectId}`),
 
   updateProject: (projectId: string, name: string) =>

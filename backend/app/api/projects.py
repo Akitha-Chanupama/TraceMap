@@ -82,20 +82,22 @@ def open_project(project_in: ProjectCreate, background_tasks: BackgroundTasks, d
 
 @router.post("/select-folder")
 def select_folder_dialog():
-    """Opens native Windows folder selection dialog using tkinter where available."""
+    """Opens native Windows/OS folder selection dialog using dedicated subprocess."""
     try:
-        import tkinter as tk
-        from tkinter import filedialog
-        root = tk.Tk()
-        root.withdraw()
-        root.attributes("-topmost", True)
-        selected_path = filedialog.askdirectory(title="Select Project Directory for TraceMap")
-        root.destroy()
+        from app.utils.dialog import open_folder_dialog
+        selected_path = open_folder_dialog()
         if selected_path:
             return {"selected_path": str(Path(selected_path).resolve())}
         return {"selected_path": None}
     except Exception as e:
         return {"selected_path": None, "error": str(e)}
+
+
+@router.get("/browse-filesystem")
+def browse_filesystem(path: str | None = None):
+    """Provides in-app directory listing for browsing local folders directly in the web app."""
+    from app.utils.filesystem_browser import browse_directory
+    return browse_directory(path)
 
 
 @router.get("/{project_id}", response_model=ProjectResponse)
