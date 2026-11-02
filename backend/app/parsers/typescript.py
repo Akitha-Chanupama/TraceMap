@@ -130,3 +130,4 @@ class TypeScriptParser(JavaScriptParser):
             current_scope=current_scope,
             is_exported_context=is_exported_context,
         )
+

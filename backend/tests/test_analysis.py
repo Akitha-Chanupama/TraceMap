@@ -51,3 +51,4 @@ def test_impact_analysis():
     assert "app.ts" in transitive_paths
     assert "profile.tsx" in transitive_paths
     assert impact.max_depth == 2
+

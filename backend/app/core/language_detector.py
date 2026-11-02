@@ -139,3 +139,4 @@ class ProjectDetector:
 
         final_project_type = " / ".join(dict.fromkeys(project_types)) if project_types else "Generic / Polyglot"
         return final_project_type, frameworks, config_data
+

@@ -23,3 +23,4 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
 
   return response.json();
 }
+

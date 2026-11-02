@@ -118,3 +118,4 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({ isOpen, on
     </div>
   );
 };
+

@@ -35,3 +35,4 @@ export const useProjectStore = create<ProjectState>((set) => ({
       analysisProgress: { ...state.analysisProgress, ...progress },
     })),
 }));
+

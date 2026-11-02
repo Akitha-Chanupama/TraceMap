@@ -48,3 +48,4 @@ def test_reference_resolver():
     status, target, pkg, conf = resolver.resolve_dependency("backend/app/main.py", "os", "python")
     assert status == "builtin"
     assert pkg == "os"
+

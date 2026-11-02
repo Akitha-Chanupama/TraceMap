@@ -67,3 +67,4 @@ All REST endpoints are namespaced under `/api/v1` and accept/return JSON payload
     - `indexing_progress`: `{"phase": "indexing", "current": int, "total": int}`
     - `analysis_completed`: `{"phase": "completed", "current": 100, "total": 100}`
     - `file_changed`: `{"event_type": "modified", "relative_path": "src/App.tsx"}`
+

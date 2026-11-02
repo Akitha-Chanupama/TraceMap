@@ -47,3 +47,4 @@ TraceMap adheres strictly to evidence-based analysis:
 - All project indexes, symbols, and dependencies are stored in `tracemap.db` in the repository root.
 - No network communication occurs outside `127.0.0.1`.
 - Project deletion from TraceMap strictly removes database records and never deletes user code.
+

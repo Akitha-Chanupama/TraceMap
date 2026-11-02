@@ -28,3 +28,4 @@ Get-Process -Name "python", "node" | Where-Object {
 } | Stop-Process -Force -ErrorAction SilentlyContinue
 
 Write-Host "TraceMap stopped successfully." -ForegroundColor Green
+

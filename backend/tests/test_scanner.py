@@ -68,3 +68,4 @@ def test_project_scanner(tmp_path):
 
     code_files = [f for f in files if f.is_code_file]
     assert len(code_files) == 2
+

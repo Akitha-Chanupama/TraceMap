@@ -14,3 +14,4 @@ def calculate_file_hash(file_path: Path) -> str:
 def calculate_content_hash(content: str) -> str:
     """Computes SHA-256 hash of string content."""
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
+

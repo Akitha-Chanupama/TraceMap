@@ -98,3 +98,4 @@ class WatcherManager:
     @classmethod
     def is_watching(cls, project_id: str) -> bool:
         return project_id in cls._observers
+

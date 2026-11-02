@@ -46,3 +46,4 @@ export const projectApi = {
       latest_run?: any;
     }>(`/projects/${projectId}/status`),
 };
+

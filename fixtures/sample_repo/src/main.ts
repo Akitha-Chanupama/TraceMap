@@ -6,3 +6,4 @@ export function bootstrap() {
   const now = formatDate(new Date());
   console.log('App started at', now, 'with user', user?.name);
 }
+

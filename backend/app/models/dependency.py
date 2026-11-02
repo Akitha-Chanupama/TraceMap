@@ -29,3 +29,4 @@ class Dependency(Base):
     target_file = relationship("SourceFile", foreign_keys=[target_file_id], back_populates="incoming_dependencies")
     source_symbol = relationship("Symbol", foreign_keys=[source_symbol_id])
     target_symbol = relationship("Symbol", foreign_keys=[target_symbol_id])
+

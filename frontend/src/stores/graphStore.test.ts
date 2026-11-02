@@ -55,3 +55,4 @@ describe('useGraphStore', () => {
     expect(useGraphStore.getState().searchQuery).toBe('auth');
   });
 });
+

@@ -267,3 +267,4 @@ class IndexingService:
             self.project.analysis_status = "failed"
             self.db.commit()
             raise
+

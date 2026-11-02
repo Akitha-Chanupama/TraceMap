@@ -59,3 +59,4 @@ class BaseParser(ABC):
     def parse(self, code_bytes: bytes, file_path: str = "") -> ParseResult:
         """Parses source code bytes into AST and extracts semantic entities."""
         pass
+

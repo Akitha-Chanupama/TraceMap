@@ -18,3 +18,4 @@ cd "../frontend"
 npm install
 
 echo "=== Setup Complete. Run ./scripts/start.sh ==="
+

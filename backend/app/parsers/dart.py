@@ -221,3 +221,4 @@ class DartParser(BaseParser):
                 count += 1
             stack.extend(curr.children)
         return count
+

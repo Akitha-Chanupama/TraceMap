@@ -30,3 +30,4 @@ TraceMap automatically excludes files containing secrets from indexing:
 - `.env`, `.env.local`, `.env.*`
 - `.pem`, `.key`, `.crt`, `.pfx`
 - Credentials, private keys, and binary caches
+

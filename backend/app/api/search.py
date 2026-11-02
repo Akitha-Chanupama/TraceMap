@@ -63,3 +63,4 @@ def global_search(project_id: str, q: str = Query(..., min_length=1), db: Sessio
         ],
         "packages": [p[0] for p in packages],
     }
+

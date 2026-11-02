@@ -26,3 +26,4 @@ def list_symbols(
     if search:
         query = query.filter(Symbol.name.ilike(f"%{search}%") | Symbol.qualified_name.ilike(f"%{search}%"))
     return query.limit(limit).all()
+

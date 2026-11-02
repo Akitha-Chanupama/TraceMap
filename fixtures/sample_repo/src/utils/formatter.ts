@@ -5,3 +5,4 @@ export function formatDate(date: Date): string {
 export function formatUserName(firstName: string, lastName: string): string {
   return `${firstName} ${lastName}`.trim();
 }
+

@@ -108,3 +108,4 @@ class GraphService:
                 search_query=search,
                 max_nodes=max_nodes,
             )
+

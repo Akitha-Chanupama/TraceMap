@@ -8,3 +8,4 @@ export const ArchitecturePage: React.FC = () => {
     </div>
   );
 };
+

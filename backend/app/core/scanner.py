@@ -102,3 +102,4 @@ class ProjectScanner:
                 except Exception:
                     # Skip unreadable or locked files gracefully
                     continue
+

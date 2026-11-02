@@ -70,3 +70,4 @@ Write-Host "  TraceMap Setup Complete!               " -ForegroundColor Green
 Write-Host "  To start the application, run:          " -ForegroundColor Green
 Write-Host "    .\scripts\start.ps1                   " -ForegroundColor White
 Write-Host "==========================================" -ForegroundColor Green
+

@@ -25,3 +25,4 @@ class BaseParser(ABC):
 ```
 
 Future languages (such as Go, Rust, C#, Java, and C++) can be added by registering a new parser class with `ParserRegistry.get_parser_for_language(...)`.
+

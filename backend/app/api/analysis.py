@@ -46,3 +46,4 @@ def get_impact_analysis(project_id: str, node_id: str, db: Session = Depends(get
     # Support both file_id and file_<uuid> node_id prefixes
     clean_id = node_id.replace("file_", "")
     return AnalysisService.get_impact_analysis(db, project_id, clean_id)
+

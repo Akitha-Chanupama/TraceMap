@@ -17,3 +17,4 @@ export const useUiStore = create<UiState>((set) => ({
   closeSourceViewer: () => set({ sourceViewerOpen: false }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 }));
+

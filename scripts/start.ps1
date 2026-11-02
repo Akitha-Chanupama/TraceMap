@@ -75,3 +75,4 @@ if ($ready) {
 } else {
     Write-Warning "Backend is still starting. Check http://localhost:5173 shortly."
 }
+

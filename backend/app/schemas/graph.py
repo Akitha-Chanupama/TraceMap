@@ -38,3 +38,4 @@ class GraphDataResponse(BaseModel):
     nodes: List[GraphNode]
     edges: List[GraphEdge]
     stats: Dict[str, Any] = Field(default_factory=dict)
+

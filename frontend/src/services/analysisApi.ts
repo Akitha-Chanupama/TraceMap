@@ -26,3 +26,4 @@ export const analysisApi = {
   getUnusedSymbols: (projectId: string) =>
     request<UnusedSymbolItem[]>(`/projects/${projectId}/analysis/unused-symbols`),
 };
+

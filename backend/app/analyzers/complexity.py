@@ -87,3 +87,4 @@ class ComplexityAnalyzer:
             high_complexity_files=high_complexity[:20],
             metrics_by_file=items,
         )
+

@@ -90,3 +90,4 @@ class AnalysisSummaryResponse(BaseModel):
     language_breakdown: Dict[str, int]
     top_connected_files: List[Dict[str, Any]]
     largest_files: List[Dict[str, Any]]
+

@@ -21,3 +21,4 @@ export const fileApi = {
   getFileSource: (projectId: string, fileId: string) =>
     request<SourceCodeResponse>(`/projects/${projectId}/files/${fileId}/source`),
 };
+

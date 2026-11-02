@@ -20,3 +20,4 @@ class SettingsUpdate(BaseModel):
     theme_preference: str | None = None
     auto_file_watching: bool | None = None
     max_file_size_bytes: int | None = None
+

@@ -99,3 +99,4 @@ export const ArchitectureNode: React.FC<NodeProps> = memo(({ data, selected }) =
     </div>
   );
 });
+

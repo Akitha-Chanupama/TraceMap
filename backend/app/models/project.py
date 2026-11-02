@@ -29,3 +29,4 @@ class Project(Base):
     dependencies = relationship("Dependency", back_populates="project", cascade="all, delete-orphan")
     analysis_runs = relationship("AnalysisRun", back_populates="project", cascade="all, delete-orphan")
     graph_snapshots = relationship("GraphSnapshot", back_populates="project", cascade="all, delete-orphan")
+

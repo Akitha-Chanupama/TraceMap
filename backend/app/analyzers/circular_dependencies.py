@@ -103,3 +103,4 @@ class CircularDependencyAnalyzer:
             total_cycles=len(detected_cycles),
             cycles=detected_cycles,
         )
+

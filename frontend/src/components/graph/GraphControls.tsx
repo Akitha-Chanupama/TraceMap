@@ -142,3 +142,4 @@ export const GraphControls: React.FC<GraphControlsProps> = ({ onFitView, onExpor
     </div>
   );
 };
+

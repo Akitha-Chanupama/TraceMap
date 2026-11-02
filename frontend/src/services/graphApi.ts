@@ -28,3 +28,4 @@ export const graphApi = {
       outgoing: Array<{ file: string; statement?: string }>;
     }>(`/projects/${projectId}/graph/neighbors/${nodeId}`),
 };
+

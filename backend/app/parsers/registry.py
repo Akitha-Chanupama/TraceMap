@@ -30,3 +30,4 @@ class ParserRegistry:
     @classmethod
     def get_supported_languages(cls) -> list[str]:
         return ["javascript", "jsx", "typescript", "tsx", "python", "dart"]
+

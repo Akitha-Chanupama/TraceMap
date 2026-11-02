@@ -30,3 +30,4 @@ def update_settings(update_in: SettingsUpdate, db: Session = Depends(get_db)):
 
     db.commit()
     return SettingsResponse(**updated_dict)
+

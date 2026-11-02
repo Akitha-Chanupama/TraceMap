@@ -87,3 +87,4 @@ def test_acceptance_impact_analysis(sample_project):
     assert impact.total_affected_files >= 1
     dependants = {d.relative_path.replace("\\", "/") for d in impact.direct_dependants}
     assert "src/main.ts" in dependants
+

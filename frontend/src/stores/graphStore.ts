@@ -47,3 +47,4 @@ export const useGraphStore = create<GraphState>((set) => ({
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setMaxNodes: (maxNodes) => set({ maxNodes }),
 }));
+

@@ -105,3 +105,4 @@ class ImpactAnalyzer:
             max_depth=max_depth,
             explanation=explanation,
         )
+

@@ -92,3 +92,4 @@ class HomeScreen extends StatelessWidget {
     assert len(result.imports) == 2
     sym_names = {s.name for s in result.symbols}
     assert "HomeScreen" in sym_names
+

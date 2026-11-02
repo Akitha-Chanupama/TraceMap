@@ -41,3 +41,4 @@ class GraphSnapshot(Base):
 
     # Relationships
     project = relationship("Project", back_populates="graph_snapshots")
+

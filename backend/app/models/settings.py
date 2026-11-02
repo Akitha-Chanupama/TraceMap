@@ -15,3 +15,4 @@ class AppSettings(Base):
     settings_key = Column(String(100), unique=True, nullable=False, index=True)
     settings_value = Column(JSON, nullable=False)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
+

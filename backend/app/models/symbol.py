@@ -31,3 +31,4 @@ class Symbol(Base):
     project = relationship("Project", back_populates="symbols")
     source_file = relationship("SourceFile", back_populates="symbols")
     children = relationship("Symbol", backref="parent", remote_side=[id])
+
