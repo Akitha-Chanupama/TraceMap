@@ -31,7 +31,7 @@ $backendProcess = Start-Process `
     -PassThru `
     -WindowStyle Hidden
 
-Write-Host "  ✓ Backend started (PID: $($backendProcess.Id))" -ForegroundColor Green
+Write-Host ("  [+] Backend started - PID: " + $backendProcess.Id) -ForegroundColor Green
 
 # 2. Start Frontend
 Write-Host "[2/3] Launching Vite frontend on localhost:5173..." -ForegroundColor Yellow
@@ -42,7 +42,7 @@ $frontendProcess = Start-Process `
     -PassThru `
     -WindowStyle Hidden
 
-Write-Host "  ✓ Frontend started (PID: $($frontendProcess.Id))" -ForegroundColor Green
+Write-Host ("  [+] Frontend started - PID: " + $frontendProcess.Id) -ForegroundColor Green
 
 # Record PIDs
 "$($backendProcess.Id)`n$($frontendProcess.Id)" | Out-File -FilePath $pidFile -Encoding ascii
