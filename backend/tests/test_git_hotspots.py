@@ -63,3 +63,4 @@ def test_git_hotspot_analysis(tmp_path):
     assert hot_stat["churn_score"] > cold_stat["churn_score"]
     assert hot_stat["author_count"] == 1
     assert hot_stat["hotspot_level"] in ("high", "critical")
+

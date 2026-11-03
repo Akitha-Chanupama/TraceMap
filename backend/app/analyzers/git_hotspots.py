@@ -210,3 +210,4 @@ class GitHotspotAnalyzer:
             "top_authors": top_authors,
             "message": None,
         }
+
