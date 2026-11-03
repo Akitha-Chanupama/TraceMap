@@ -16,6 +16,7 @@ from app.schemas.analysis import (
     ComplexityReportResponse,
     UnresolvedDependencyItem,
     UnusedSymbolItem,
+    GitHotspotsResponse,
 )
 
 
@@ -221,4 +222,27 @@ class AnalysisService:
                     )
                 )
         return items[:50]
+
+    @staticmethod
+    def get_git_hotspots(db: Session, project_id: str) -> GitHotspotsResponse:
+        """Analyzes Git churn and identifies code hotspots based on commit frequency and complexity."""
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        files = db.query(SourceFile).filter(SourceFile.project_id == project_id).all()
+        files_map = {
+            f.relative_path: {
+                "id": f.id,
+                "line_count": f.line_count,
+                "language": f.language,
+                "file_size": f.file_size,
+            }
+            for f in files
+        }
+
+        from app.analyzers.git_hotspots import GitHotspotAnalyzer
+        analyzer = GitHotspotAnalyzer(project.root_path, files_map=files_map)
+        res = analyzer.analyze()
+        return GitHotspotsResponse(**res)
 

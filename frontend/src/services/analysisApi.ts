@@ -5,6 +5,7 @@ import {
   ComplexityReportResponse,
   UnresolvedDependencyItem,
   UnusedSymbolItem,
+  GitHotspotsResponse,
 } from '../types/analysis';
 import { ProjectSummary } from '../types/project';
 
@@ -25,5 +26,8 @@ export const analysisApi = {
 
   getUnusedSymbols: (projectId: string) =>
     request<UnusedSymbolItem[]>(`/projects/${projectId}/analysis/unused-symbols`),
+
+  getGitHotspots: (projectId: string) =>
+    request<GitHotspotsResponse>(`/projects/${projectId}/analysis/git-hotspots`),
 };
 

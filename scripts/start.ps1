@@ -26,8 +26,8 @@ if (Test-Path $pidFile) {
 Write-Host "[1/3] Launching FastAPI backend on 127.0.0.1:8000..." -ForegroundColor Yellow
 $backendProcess = Start-Process `
     -FilePath $venvPython `
-    -ArgumentList "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload" `
-    -WorkingDirectory $backendDir `
+    -ArgumentList "-m", "uvicorn", "app.main:app", "--app-dir", "backend", "--host", "127.0.0.1", "--port", "8000", "--reload" `
+    -WorkingDirectory $rootDir `
     -PassThru `
     -WindowStyle Hidden
 
@@ -37,8 +37,8 @@ Write-Host ("  [+] Backend started - PID: " + $backendProcess.Id) -ForegroundCol
 Write-Host "[2/3] Launching Vite frontend on localhost:5173..." -ForegroundColor Yellow
 $frontendProcess = Start-Process `
     -FilePath "cmd.exe" `
-    -ArgumentList "/c", "npm run dev" `
-    -WorkingDirectory $frontendDir `
+    -ArgumentList "/c", "npm run dev --prefix frontend" `
+    -WorkingDirectory $rootDir `
     -PassThru `
     -WindowStyle Hidden
 
@@ -71,7 +71,6 @@ if ($ready) {
     Write-Host "  To stop TraceMap, run:                  " -ForegroundColor White
     Write-Host "    .\scripts\stop.ps1                    " -ForegroundColor White
     Write-Host "==========================================" -ForegroundColor Green
-    Start-Process "http://localhost:5173"
 } else {
     Write-Warning "Backend is still starting. Check http://localhost:5173 shortly."
 }

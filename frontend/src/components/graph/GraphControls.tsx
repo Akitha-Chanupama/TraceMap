@@ -7,6 +7,7 @@ import {
   Search,
   Maximize,
   FileText,
+  Flame,
 } from 'lucide-react';
 import { useGraphStore, GraphMode, GraphLayout } from '../../stores/graphStore';
 
@@ -24,6 +25,8 @@ export const GraphControls: React.FC<GraphControlsProps> = ({ onFitView, onExpor
     layout,
     searchQuery,
     filterLanguage,
+    hotspotOverlay,
+    toggleHotspotOverlay,
     setGraphMode,
     setLayout,
     setSearchQuery,
@@ -32,7 +35,7 @@ export const GraphControls: React.FC<GraphControlsProps> = ({ onFitView, onExpor
 
   return (
     <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-      {/* Left group: Graph Mode & Layout */}
+      {/* Left group: Graph Mode, Layout & Hotspots Overlay */}
       <div className="flex items-center gap-2 bg-bg-panel/90 backdrop-blur-md border border-border-subtle p-1.5 rounded-xl shadow-xl pointer-events-auto">
         {/* Mode Selector */}
         <div className="flex items-center gap-1 bg-bg-main p-1 rounded-lg border border-border-subtle">
@@ -82,6 +85,20 @@ export const GraphControls: React.FC<GraphControlsProps> = ({ onFitView, onExpor
           <option value="radial">Radial Layout</option>
           <option value="force">Force Directed</option>
         </select>
+
+        {/* Hotspots Heatmap Toggle */}
+        <button
+          onClick={toggleHotspotOverlay}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+            hotspotOverlay
+              ? 'bg-accent-red/20 border-accent-red/40 text-accent-red shadow-sm'
+              : 'bg-bg-main hover:bg-bg-elevated border-border-subtle text-text-secondary hover:text-text-primary'
+          }`}
+          title="Toggle Git Churn & Hotspots Risk Overlay"
+        >
+          <Flame className={`w-3.5 h-3.5 ${hotspotOverlay ? 'text-accent-red animate-pulse' : 'text-text-muted'}`} />
+          <span>Hotspots</span>
+        </button>
       </div>
 
       {/* Right group: Search, Filter, Export & Zoom */}

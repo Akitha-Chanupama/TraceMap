@@ -74,3 +74,25 @@ export interface UnusedSymbolItem {
   reason: string;
 }
 
+export interface GitHotspotItem {
+  file_id?: string;
+  relative_path: string;
+  commit_count: number;
+  lines_added: number;
+  lines_deleted: number;
+  author_count: number;
+  last_modified_date?: string;
+  churn_score: number;
+  complexity_lines: number;
+  hotspot_level: 'low' | 'medium' | 'high' | 'critical';
+  risk_summary: string;
+}
+
+export interface GitHotspotsResponse {
+  is_git_repo: boolean;
+  total_commits_analyzed: number;
+  hotspots: GitHotspotItem[];
+  top_authors: Array<{ author: string; commits: number }>;
+  message?: string;
+}
+

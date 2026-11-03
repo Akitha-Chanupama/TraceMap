@@ -10,6 +10,7 @@ from app.schemas.analysis import (
     ComplexityReportResponse,
     UnresolvedDependencyItem,
     UnusedSymbolItem,
+    GitHotspotsResponse,
 )
 from app.services.analysis_service import AnalysisService
 
@@ -19,6 +20,11 @@ router = APIRouter(prefix="/projects/{project_id}/analysis", tags=["Analysis"])
 @router.get("/summary", response_model=AnalysisSummaryResponse)
 def get_summary(project_id: str, db: Session = Depends(get_db)):
     return AnalysisService.get_summary(db, project_id)
+
+
+@router.get("/git-hotspots", response_model=GitHotspotsResponse)
+def get_git_hotspots(project_id: str, db: Session = Depends(get_db)):
+    return AnalysisService.get_git_hotspots(db, project_id)
 
 
 @router.get("/circular-dependencies", response_model=CircularDependenciesResponse)
