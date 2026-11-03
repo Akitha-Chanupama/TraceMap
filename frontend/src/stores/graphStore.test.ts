@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGraphStore } from './graphStore';
 import { GraphNode } from '../types/graph';
+import { GitHotspotItem } from '../types/analysis';
 
 describe('useGraphStore', () => {
   beforeEach(() => {
@@ -13,6 +14,8 @@ describe('useGraphStore', () => {
       filterDirectory: null,
       searchQuery: '',
       maxNodes: 300,
+      hotspotOverlay: false,
+      hotspotsMap: {},
     });
   });
 
@@ -54,5 +57,27 @@ describe('useGraphStore', () => {
     expect(useGraphStore.getState().filterDirectory).toBe('src/services');
     expect(useGraphStore.getState().searchQuery).toBe('auth');
   });
-});
 
+  it('toggles hotspot overlay and updates hotspots map', () => {
+    expect(useGraphStore.getState().hotspotOverlay).toBe(false);
+    useGraphStore.getState().toggleHotspotOverlay();
+    expect(useGraphStore.getState().hotspotOverlay).toBe(true);
+    useGraphStore.getState().toggleHotspotOverlay();
+    expect(useGraphStore.getState().hotspotOverlay).toBe(false);
+
+    const mockHotspot: GitHotspotItem = {
+      relative_path: 'backend/app/main.py',
+      commit_count: 12,
+      lines_added: 300,
+      lines_deleted: 45,
+      author_count: 2,
+      churn_score: 85,
+      complexity_lines: 150,
+      hotspot_level: 'critical',
+      risk_summary: 'Frequent revisions with high complexity',
+    };
+
+    useGraphStore.getState().setHotspotsMap({ 'backend/app/main.py': mockHotspot });
+    expect(useGraphStore.getState().hotspotsMap['backend/app/main.py']).toEqual(mockHotspot);
+  });
+});

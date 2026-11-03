@@ -91,3 +91,25 @@ class AnalysisSummaryResponse(BaseModel):
     top_connected_files: List[Dict[str, Any]]
     largest_files: List[Dict[str, Any]]
 
+
+class GitHotspotItem(BaseModel):
+    file_id: Optional[str] = None
+    relative_path: str
+    commit_count: int
+    lines_added: int
+    lines_deleted: int
+    author_count: int
+    last_modified_date: Optional[str] = None
+    churn_score: float  # 0.0 to 100.0
+    complexity_lines: int = 0
+    hotspot_level: str  # 'low' | 'medium' | 'high' | 'critical'
+    risk_summary: str
+
+
+class GitHotspotsResponse(BaseModel):
+    is_git_repo: bool
+    total_commits_analyzed: int
+    hotspots: List[GitHotspotItem]
+    top_authors: List[Dict[str, Any]] = []
+    message: Optional[str] = None
+

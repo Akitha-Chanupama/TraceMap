@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Layers,
   AlertTriangle,
+  Flame,
 } from 'lucide-react';
 import { useGraphStore } from '../../stores/graphStore';
 import { useUiStore } from '../../stores/uiStore';
@@ -17,7 +18,7 @@ import { graphApi } from '../../services/graphApi';
 import { useNavigate } from 'react-router-dom';
 
 export const NodeInspector: React.FC = () => {
-  const { selectedNode, setSelectedNode } = useGraphStore();
+  const { selectedNode, setSelectedNode, hotspotsMap } = useGraphStore();
   const { openSourceViewer } = useUiStore();
   const { currentProject } = useProjectStore();
   const navigate = useNavigate();
@@ -40,6 +41,8 @@ export const NodeInspector: React.FC = () => {
 
   const data = selectedNode.data;
   const isFile = data.entity_type === 'file';
+  const relPath = data.relative_path || '';
+  const hotspot = hotspotsMap[relPath] || hotspotsMap[relPath.replace(/\\/g, '/')];
 
   return (
     <div className="w-80 bg-bg-panel border-l border-border-subtle h-full flex flex-col z-10 shadow-2xl animate-in slide-in-from-right-4 duration-150">
@@ -102,8 +105,64 @@ export const NodeInspector: React.FC = () => {
         )}
       </div>
 
-      {/* Relationships */}
+      {/* Details & Relationships */}
       <div className="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
+        {/* Hotspot Risk Card */}
+        {hotspot && (
+          <div className="p-3 rounded-xl bg-bg-secondary border border-border-subtle space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
+                <Flame
+                  className={`w-4 h-4 ${
+                    hotspot.hotspot_level === 'critical'
+                      ? 'text-accent-red animate-pulse'
+                      : hotspot.hotspot_level === 'high'
+                      ? 'text-accent-amber'
+                      : 'text-accent-blue'
+                  }`}
+                />
+                <span>Git Churn Hotspot</span>
+              </span>
+              <span
+                className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-mono ${
+                  hotspot.hotspot_level === 'critical'
+                    ? 'bg-accent-red/20 text-accent-red border border-accent-red/35'
+                    : hotspot.hotspot_level === 'high'
+                    ? 'bg-accent-amber/20 text-accent-amber border border-accent-amber/35'
+                    : hotspot.hotspot_level === 'medium'
+                    ? 'bg-accent-blue/20 text-accent-blue border border-accent-blue/35'
+                    : 'bg-accent-green/20 text-accent-green border border-accent-green/35'
+                }`}
+              >
+                {hotspot.hotspot_level} ({hotspot.churn_score}/100)
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-text-muted pt-1">
+              <div className="p-1.5 rounded bg-bg-main border border-border-subtle">
+                <div className="text-[10px] text-text-muted">Revisions</div>
+                <div className="text-text-primary font-bold">{hotspot.commit_count} commits</div>
+              </div>
+              <div className="p-1.5 rounded bg-bg-main border border-border-subtle">
+                <div className="text-[10px] text-text-muted">Contributors</div>
+                <div className="text-text-primary font-bold">{hotspot.author_count} authors</div>
+              </div>
+              <div className="p-1.5 rounded bg-bg-main border border-border-subtle">
+                <div className="text-[10px] text-text-muted">Lines Added</div>
+                <div className="text-accent-green font-bold">+{hotspot.lines_added.toLocaleString()}</div>
+              </div>
+              <div className="p-1.5 rounded bg-bg-main border border-border-subtle">
+                <div className="text-[10px] text-text-muted">Lines Deleted</div>
+                <div className="text-accent-red font-bold">-{hotspot.lines_deleted.toLocaleString()}</div>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-text-secondary leading-snug pt-1 border-t border-border-subtle">
+              {hotspot.risk_summary}
+            </p>
+          </div>
+        )}
+
         {/* Outgoing Dependencies */}
         <div>
           <div className="flex items-center justify-between text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-2">
@@ -163,4 +222,3 @@ export const NodeInspector: React.FC = () => {
     </div>
   );
 };
-

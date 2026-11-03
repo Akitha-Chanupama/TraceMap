@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { GraphNode } from '../types/graph';
+import { GitHotspotItem } from '../types/analysis';
 
 export type GraphMode =
   | 'file_dependency'
@@ -19,6 +20,8 @@ interface GraphState {
   filterDirectory: string | null;
   searchQuery: string;
   maxNodes: number;
+  hotspotOverlay: boolean;
+  hotspotsMap: Record<string, GitHotspotItem>;
   setGraphMode: (mode: GraphMode) => void;
   setLayout: (layout: GraphLayout) => void;
   setSelectedNode: (node: GraphNode | null) => void;
@@ -27,6 +30,8 @@ interface GraphState {
   setFilterDirectory: (dir: string | null) => void;
   setSearchQuery: (query: string) => void;
   setMaxNodes: (max: number) => void;
+  toggleHotspotOverlay: () => void;
+  setHotspotsMap: (map: Record<string, GitHotspotItem>) => void;
 }
 
 export const useGraphStore = create<GraphState>((set) => ({
@@ -38,6 +43,8 @@ export const useGraphStore = create<GraphState>((set) => ({
   filterDirectory: null,
   searchQuery: '',
   maxNodes: 300,
+  hotspotOverlay: false,
+  hotspotsMap: {},
   setGraphMode: (graphMode) => set({ graphMode }),
   setLayout: (layout) => set({ layout }),
   setSelectedNode: (selectedNode) => set({ selectedNode }),
@@ -46,5 +53,7 @@ export const useGraphStore = create<GraphState>((set) => ({
   setFilterDirectory: (filterDirectory) => set({ filterDirectory }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setMaxNodes: (maxNodes) => set({ maxNodes }),
+  toggleHotspotOverlay: () => set((state) => ({ hotspotOverlay: !state.hotspotOverlay })),
+  setHotspotsMap: (hotspotsMap) => set({ hotspotsMap }),
 }));
 

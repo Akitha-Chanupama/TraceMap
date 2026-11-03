@@ -4,7 +4,7 @@ from app.api.health import get_health
 from app.api.projects import list_projects, open_project, get_project, delete_project
 from app.api.files import list_files, get_file_tree, get_file_source
 from app.api.graph import get_graph
-from app.api.analysis import get_summary, get_circular_dependencies, get_complexity, get_impact_analysis
+from app.api.analysis import get_summary, get_circular_dependencies, get_complexity, get_impact_analysis, get_git_hotspots
 from app.schemas.project import ProjectCreate
 from fastapi import BackgroundTasks
 
@@ -90,6 +90,10 @@ def test_project_and_analysis_apis(db_session, tmp_path):
     assert impact_res.total_affected_files == 1
     assert impact_res.direct_dependants[0].relative_path == "src/index.ts"
 
-    # 9. Delete Project
+    # 9. Git Hotspots API
+    hotspots_res = get_git_hotspots(proj.id, db=db_session)
+    assert isinstance(hotspots_res.is_git_repo, bool)
+
+    # 10. Delete Project
     del_res = delete_project(proj.id, db=db_session)
     assert del_res["message"] == "Project removed from history"
