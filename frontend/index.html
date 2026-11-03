@@ -5,10 +5,28 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TraceMap — Codebase Intelligence & Architecture Visualization</title>
+    <script>
+      // Automatically purge any conflicting legacy service workers or PWA caches from localhost
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (var i = 0; i < registrations.length; i++) {
+            registrations[i].unregister();
+            console.log('[TraceMap] Purged legacy service worker:', registrations[i].scope);
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(keys) {
+          for (var j = 0; j < keys.length; j++) {
+            caches.delete(keys[j]);
+            console.log('[TraceMap] Cleared cache storage:', keys[j]);
+          }
+        });
+      }
+    </script>
   </head>
   <body class="bg-[#0B0D12] text-[#E8EDF5] overflow-hidden antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

@@ -1,16 +1,22 @@
 import os
+from pathlib import Path
 from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+_DEFAULT_DB_FILE = (_ROOT_DIR / "tracemap.db").resolve()
 
 
 class Settings(BaseSettings):
     HOST: str = "127.0.0.1"
     PORT: int = 8000
     DEBUG: bool = False
-    DATABASE_URL: str = "sqlite:///./tracemap.db"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{_DEFAULT_DB_FILE.as_posix()}")
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5175",
+        "http://127.0.0.1:5175",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
     ]

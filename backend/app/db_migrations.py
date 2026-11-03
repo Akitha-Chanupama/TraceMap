@@ -35,3 +35,4 @@ def run_startup_migrations(engine: Engine):
             )
     except Exception as e:
         print(f"[TraceMap Migrations] Notice: {e}")
+
