@@ -89,55 +89,67 @@ export const HomePage: React.FC<{ onOpenProject: () => void }> = ({ onOpenProjec
   // Language Breakdown Data
   const langData = useMemo(() => {
     if (!s?.language_breakdown) return [];
-    return Object.entries(s.language_breakdown).map(([name, value]) => ({
-      name,
-      value,
-    }));
+    return Object.entries(s.language_breakdown)
+      .map(([name, value]) => ({
+        name,
+        value,
+      }))
+      .sort((a, b) => b.value - a.value);
   }, [s?.language_breakdown]);
 
   const totalLanguageFiles = useMemo(() => {
     return langData.reduce((acc, curr) => acc + curr.value, 0);
   }, [langData]);
 
-  // Coupling Data: Fan-In vs Fan-Out
+  // Coupling Data: Fan-In vs Fan-Out (Prioritize real connected modules)
   const couplingData = useMemo(() => {
-    const list = complexityData?.high_complexity_files || complexityData?.metrics_by_file || [];
-    if (list.length === 0 && s?.top_connected_files) {
+    // 1. Gather all files with metrics and find those with active internal dependencies
+    const allFiles = complexityData?.metrics_by_file || [];
+    const connected = allFiles.filter((item) => (item.fan_in || 0) + (item.fan_out || 0) > 0);
+
+    if (connected.length > 0) {
+      return connected
+        .slice()
+        .sort((a, b) => (b.fan_in + b.fan_out) - (a.fan_in + a.fan_out))
+        .slice(0, 8)
+        .map((item) => {
+          const shortName = item.relative_path.split(/[/\\]/).pop() || item.relative_path;
+          const total = item.fan_in + item.fan_out;
+          const instability = total > 0 ? Number((item.fan_out / total).toFixed(2)) : 0;
+          return {
+            name: shortName,
+            fullPath: item.relative_path,
+            fanIn: item.fan_in,
+            fanOut: item.fan_out,
+            totalLinks: total,
+            instability,
+            complexity: item.cyclomatic_complexity,
+            fileId: item.file_id,
+          };
+        });
+    }
+
+    // 2. Fallback to summary's top_connected_files if metrics_by_file is empty
+    if (s?.top_connected_files && s.top_connected_files.length > 0) {
       return s.top_connected_files.slice(0, 8).map((f) => {
         const shortName = f.file.split(/[/\\]/).pop() || f.file;
+        const inLinks = Math.max(1, Math.floor(f.connections * 0.6));
+        const outLinks = Math.max(0, f.connections - inLinks);
         return {
           name: shortName,
           fullPath: f.file,
-          fanIn: Math.floor(f.connections * 0.6),
-          fanOut: Math.ceil(f.connections * 0.4),
+          fanIn: inLinks,
+          fanOut: outLinks,
           totalLinks: f.connections,
-          instability: 0.4,
+          instability: Number((outLinks / f.connections).toFixed(2)),
           complexity: 1,
           fileId: undefined as string | undefined,
         };
       });
     }
 
-    return list
-      .slice()
-      .sort((a, b) => b.fan_in + b.fan_out - (a.fan_in + a.fan_out))
-      .slice(0, 8)
-      .map((item) => {
-        const shortName = item.relative_path.split(/[/\\]/).pop() || item.relative_path;
-        const total = item.fan_in + item.fan_out;
-        const instability = total > 0 ? (item.fan_out / total).toFixed(2) : '0.00';
-        return {
-          name: shortName,
-          fullPath: item.relative_path,
-          fanIn: item.fan_in,
-          fanOut: item.fan_out,
-          totalLinks: total,
-          instability: Number(instability),
-          complexity: item.cyclomatic_complexity,
-          fileId: item.file_id,
-        };
-      });
-  }, [complexityData, s?.top_connected_files]);
+    return [];
+  }, [complexityData?.metrics_by_file, s?.top_connected_files]);
 
   // Scale & Complexity Curve Data
   const scaleData = useMemo(() => {
@@ -519,31 +531,39 @@ export const HomePage: React.FC<{ onOpenProject: () => void }> = ({ onOpenProjec
               </div>
 
               <div className="h-56 w-full pt-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={couplingData.slice(0, 5)} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.gridLine} vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      stroke={PALETTE.textMuted}
-                      fontSize={10}
-                      tickLine={false}
-                      interval={0}
-                      angle={-20}
-                      textAnchor="end"
-                    />
-                    <YAxis stroke={PALETTE.textMuted} fontSize={10} tickLine={false} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#151B25',
-                        borderColor: '#283244',
-                        fontSize: '11px',
-                        borderRadius: '10px',
-                      }}
-                    />
-                    <Bar dataKey="fanIn" name="Fan-In (Dependants)" fill={PALETTE.cyan} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="fanOut" name="Fan-Out (Dependencies)" fill={PALETTE.purple} radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                {couplingData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={couplingData.slice(0, 5)} margin={{ top: 10, right: 10, left: -20, bottom: 30 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.gridLine} vertical={false} />
+                      <XAxis
+                        dataKey="name"
+                        stroke={PALETTE.textMuted}
+                        fontSize={10}
+                        tickLine={false}
+                        interval={0}
+                        angle={-20}
+                        textAnchor="end"
+                      />
+                      <YAxis stroke={PALETTE.textMuted} fontSize={10} tickLine={false} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#151B25',
+                          borderColor: '#283244',
+                          fontSize: '11px',
+                          borderRadius: '10px',
+                        }}
+                      />
+                      <Bar dataKey="fanIn" name="Fan-In (Dependants)" fill={PALETTE.cyan} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="fanOut" name="Fan-Out (Dependencies)" fill={PALETTE.purple} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-4 text-xs text-text-muted">
+                    <Boxes className="w-8 h-8 text-text-muted/30 mb-2" />
+                    <p className="font-medium text-text-secondary">No Coupled Modules Detected</p>
+                    <p className="text-[11px] text-text-muted mt-0.5">Scanned files have zero internal import dependencies.</p>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-4 border-t border-border-subtle pt-3 text-xs">
@@ -738,34 +758,42 @@ export const HomePage: React.FC<{ onOpenProject: () => void }> = ({ onOpenProjec
             </div>
 
             <div className="h-80 w-full pt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={couplingData} margin={{ top: 10, right: 20, left: 0, bottom: 40 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.gridLine} vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    stroke={PALETTE.textMuted}
-                    fontSize={11}
-                    tickLine={false}
-                    interval={0}
-                    angle={-25}
-                    textAnchor="end"
-                  />
-                  <YAxis stroke={PALETTE.textMuted} fontSize={11} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#151B25',
-                      borderColor: '#283244',
-                      fontSize: '11px',
-                      borderRadius: '10px',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-                    }}
-                    formatter={(value: any, name: any) => [value, name]}
-                  />
-                  <Legend />
-                  <Bar dataKey="fanIn" name="Fan-In (Incoming Dependants)" fill={PALETTE.cyan} radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="fanOut" name="Fan-Out (Outgoing Dependencies)" fill={PALETTE.purple} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {couplingData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={couplingData} margin={{ top: 10, right: 20, left: 0, bottom: 40 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={PALETTE.gridLine} vertical={false} />
+                    <XAxis
+                      dataKey="name"
+                      stroke={PALETTE.textMuted}
+                      fontSize={11}
+                      tickLine={false}
+                      interval={0}
+                      angle={-25}
+                      textAnchor="end"
+                    />
+                    <YAxis stroke={PALETTE.textMuted} fontSize={11} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#151B25',
+                        borderColor: '#283244',
+                        fontSize: '11px',
+                        borderRadius: '10px',
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+                      }}
+                      formatter={(value: any, name: any) => [value, name]}
+                    />
+                    <Legend />
+                    <Bar dataKey="fanIn" name="Fan-In (Incoming Dependants)" fill={PALETTE.cyan} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="fanOut" name="Fan-Out (Outgoing Dependencies)" fill={PALETTE.purple} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-xs text-text-muted">
+                  <Boxes className="w-10 h-10 text-text-muted/30 mb-2" />
+                  <p className="font-semibold text-text-secondary text-sm">No Coupled Modules Detected</p>
+                  <p className="text-xs text-text-muted mt-1">This codebase does not contain internal cross-file dependencies.</p>
+                </div>
+              )}
             </div>
           </div>
 

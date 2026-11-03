@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     DEFAULT_IGNORED_EXTENSIONS: List[str] = [
         ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp",
         ".pdf", ".zip", ".tar", ".gz", ".7z", ".exe", ".dll", ".so", ".dylib",
+        ".xlsx", ".xls", ".docx", ".doc", ".pptx", ".ppt",
+        ".aar", ".jar", ".war", ".class", ".apk", ".ipa", ".a", ".lib", ".o", ".obj",
         ".woff", ".woff2", ".ttf", ".eot",
         ".mp3", ".mp4", ".wav", ".avi",
         ".pyc", ".pyo", ".pyd",
