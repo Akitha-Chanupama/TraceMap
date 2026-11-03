@@ -76,3 +76,30 @@ def get_node_neighbors(project_id: str, node_id: str, db: Session = Depends(get_
             "outgoing": [{"file": f.relative_path, "statement": d.import_statement} for d, f in outgoing],
         }
     return {"incoming": [], "outgoing": []}
+
+
+@router.get("/export")
+def export_graph_data(
+    project_id: str,
+    format: str = "json",
+    type: str = "file_dependency",
+    db: Session = Depends(get_db),
+):
+    """Exports graph data or generates a markdown architecture summary report."""
+    graph_res = GraphService.get_graph(db, project_id, graph_type=type)
+    if format == "markdown":
+        from app.models.project import Project
+        from app.services.analysis_service import AnalysisService
+        project = db.query(Project).filter(Project.id == project_id).first()
+        summary = AnalysisService.get_project_summary(db, project_id)
+        report = f"# Architecture Report: {project.name if project else 'Project'}\n\n"
+        report += f"- **Path**: `{project.root_path if project else ''}`\n"
+        report += f"- **Files**: {summary.total_files}\n"
+        report += f"- **Total Lines**: {summary.total_lines}\n"
+        report += f"- **Total Dependencies**: {summary.total_dependencies}\n"
+        report += f"- **Circular Dependency Loops**: {summary.circular_cycles_count}\n\n"
+        report += "## Top Connected Files\n"
+        for item in summary.top_connected_files:
+            report += f"- `{item['file']}` ({item['connections']} connections)\n"
+        return {"report": report, "format": "markdown"}
+    return graph_res

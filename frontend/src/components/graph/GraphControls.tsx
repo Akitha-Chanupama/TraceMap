@@ -6,13 +6,15 @@ import {
   Download,
   Search,
   Maximize,
-  RotateCcw,
+  FileText,
 } from 'lucide-react';
 import { useGraphStore, GraphMode, GraphLayout } from '../../stores/graphStore';
 
+export type ExportFormat = 'png' | 'svg' | 'json' | 'markdown';
+
 interface GraphControlsProps {
   onFitView: () => void;
-  onExport: (format: 'png' | 'svg' | 'json') => void;
+  onExport: (format: ExportFormat) => void;
   languages?: string[];
 }
 
@@ -120,26 +122,40 @@ export const GraphControls: React.FC<GraphControlsProps> = ({ onFitView, onExpor
           <Maximize className="w-3.5 h-3.5" />
         </button>
 
-        {/* Export Dropdown */}
+        {/* Export Group */}
         <div className="flex items-center gap-1 border-l border-border-subtle pl-2">
           <button
             onClick={() => onExport('png')}
-            className="px-2.5 py-1 bg-bg-elevated hover:bg-border-subtle border border-border-subtle text-text-secondary hover:text-text-primary rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors"
+            className="px-2 py-1 bg-bg-elevated hover:bg-border-subtle border border-border-subtle text-text-secondary hover:text-text-primary rounded-lg text-xs font-medium flex items-center gap-1 transition-colors"
             title="Export as PNG image"
           >
             <Download className="w-3 h-3" />
             <span>PNG</span>
           </button>
           <button
+            onClick={() => onExport('svg')}
+            className="px-2 py-1 bg-bg-elevated hover:bg-border-subtle border border-border-subtle text-text-secondary hover:text-text-primary rounded-lg text-xs font-medium transition-colors"
+            title="Export as SVG vector graphic"
+          >
+            SVG
+          </button>
+          <button
             onClick={() => onExport('json')}
-            className="px-2.5 py-1 bg-bg-elevated hover:bg-border-subtle border border-border-subtle text-text-secondary hover:text-text-primary rounded-lg text-xs font-medium transition-colors"
-            title="Export as JSON"
+            className="px-2 py-1 bg-bg-elevated hover:bg-border-subtle border border-border-subtle text-text-secondary hover:text-text-primary rounded-lg text-xs font-medium transition-colors"
+            title="Export as raw JSON data"
           >
             JSON
+          </button>
+          <button
+            onClick={() => onExport('markdown')}
+            className="px-2.5 py-1 bg-accent-blue/10 hover:bg-accent-blue/20 border border-accent-blue/30 text-accent-blue rounded-lg text-xs font-medium flex items-center gap-1 transition-colors"
+            title="Export Markdown Architecture Report"
+          >
+            <FileText className="w-3 h-3" />
+            <span>Report</span>
           </button>
         </div>
       </div>
     </div>
   );
 };
-

@@ -15,7 +15,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { ArchitectureNode } from './CustomNodes/ArchitectureNode';
-import { GraphControls } from './GraphControls';
+import { GraphControls, ExportFormat } from './GraphControls';
 import { NodeInspector } from '../inspector/NodeInspector';
 import { useGraphStore } from '../../stores/graphStore';
 import { useProjectStore } from '../../stores/projectStore';
@@ -153,23 +153,139 @@ const ArchitectureGraphInner: React.FC = () => {
     [openSourceViewer]
   );
 
-  const handleExport = (format: 'png' | 'svg' | 'json') => {
+  const generateSvgContent = () => {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    nodes.forEach((n) => {
+      minX = Math.min(minX, n.position.x);
+      minY = Math.min(minY, n.position.y);
+      maxX = Math.max(maxX, n.position.x + 240);
+      maxY = Math.max(maxY, n.position.y + 90);
+    });
+    if (!isFinite(minX)) {
+      minX = 0;
+      minY = 0;
+      maxX = 800;
+      maxY = 600;
+    }
+    const padding = 80;
+    const width = Math.max(800, Math.round(maxX - minX + padding * 2));
+    const height = Math.max(600, Math.round(maxY - minY + padding * 2));
+    const offsetX = -minX + padding;
+    const offsetY = -minY + padding;
+
+    const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+
+    const edgeSvgs = edges
+      .map((e) => {
+        const s = nodeMap.get(e.source);
+        const t = nodeMap.get(e.target);
+        if (!s || !t) return '';
+        const sx = s.position.x + offsetX + 110;
+        const sy = s.position.y + offsetY + 35;
+        const tx = t.position.x + offsetX + 110;
+        const ty = t.position.y + offsetY + 35;
+        const isCycle = e.animated;
+        const stroke = isCycle ? '#EF6464' : '#4C8DFF';
+        return `<path d="M ${sx} ${sy} Q ${(sx + tx) / 2} ${(sy + ty) / 2 - 25} ${tx} ${ty}" stroke="${stroke}" stroke-width="2" fill="none" opacity="0.65" marker-end="url(#arrow)"/>`;
+      })
+      .join('\n');
+
+    const nodeSvgs = nodes
+      .map((n) => {
+        const x = n.position.x + offsetX;
+        const y = n.position.y + offsetY;
+        const label = (n.data as any)?.label || n.id;
+        const type = (n.data as any)?.entity_type || 'file';
+        const lang = (n.data as any)?.language || '';
+        const hasCycle = (n.data as any)?.has_cycle;
+        const stroke = hasCycle ? '#EF6464' : '#283244';
+        return `
+          <g transform="translate(${x}, ${y})">
+            <rect width="220" height="70" rx="8" fill="#151B25" stroke="${stroke}" stroke-width="${hasCycle ? 2 : 1}"/>
+            <text x="14" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#E8EDF5">${label}</text>
+            <text x="14" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" fill="#929EB0">${type} ${lang ? '· ' + lang : ''}</text>
+          </g>
+        `;
+      })
+      .join('\n');
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+      <rect width="100%" height="100%" fill="#0B0D12"/>
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4C8DFF" />
+        </marker>
+      </defs>
+      <g id="edges">${edgeSvgs}</g>
+      <g id="nodes">${nodeSvgs}</g>
+    </svg>`;
+  };
+
+  const handleExport = (format: ExportFormat) => {
+    const projName = currentProject?.name || 'tracemap';
+
     if (format === 'json') {
       const exportData = {
         project: currentProject?.name,
+        root_path: currentProject?.root_path,
+        exported_at: new Date().toISOString(),
         graphMode,
-        nodes: nodes.map((n) => ({ id: n.id, data: n.data })),
-        edges: edges.map((e) => ({ source: e.source, target: e.target })),
+        stats: { total_nodes: nodes.length, total_edges: edges.length },
+        nodes: nodes.map((n) => ({ id: n.id, data: n.data, position: n.position })),
+        edges: edges.map((e) => ({ source: e.source, target: e.target, label: e.label })),
       };
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${currentProject?.name || 'tracemap'}-architecture.json`;
+      a.download = `${projName.toLowerCase().replace(/\s+/g, '-')}-architecture.json`;
       a.click();
-    } else {
-      // SVG/PNG export prompt or fallback to print/screenshot
-      window.print();
+    } else if (format === 'svg') {
+      const svg = generateSvgContent();
+      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projName.toLowerCase().replace(/\s+/g, '-')}-architecture.svg`;
+      a.click();
+    } else if (format === 'png') {
+      const svg = generateSvgContent();
+      const img = new Image();
+      const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(svgBlob);
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob((pngBlob) => {
+            if (pngBlob) {
+              const pngUrl = URL.createObjectURL(pngBlob);
+              const a = document.createElement('a');
+              a.href = pngUrl;
+              a.download = `${projName.toLowerCase().replace(/\s+/g, '-')}-architecture.png`;
+              a.click();
+              URL.revokeObjectURL(pngUrl);
+            }
+          });
+        }
+        URL.revokeObjectURL(blobUrl);
+      };
+      img.src = blobUrl;
+    } else if (format === 'markdown') {
+      const timestamp = new Date().toLocaleString();
+      const md = `# ${projName} — Architecture & Dependency Report\n*Generated by TraceMap on ${timestamp}*\n\n## Project Overview\n- **Project Root**: \`${currentProject?.root_path || 'N/A'}\`\n- **Project Type**: ${currentProject?.project_type || 'Polyglot'}\n- **Rendered Mode**: ${graphMode}\n- **Total Visible Nodes**: ${nodes.length}\n- **Total Visible Connections**: ${edges.length}\n\n## Visible Nodes\n${nodes.map((n) => `- **${(n.data as any)?.label || n.id}** (${(n.data as any)?.entity_type || 'file'})`).join('\n')}\n\n---\n*Report generated locally with 100% offline codebase intelligence by TraceMap.*\n`;
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projName.toLowerCase().replace(/\s+/g, '-')}-architecture-report.md`;
+      a.click();
     }
   };
 
