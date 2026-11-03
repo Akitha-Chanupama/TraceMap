@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -9,8 +9,12 @@ import {
   Zap,
   ShieldCheck,
   Settings,
-  FolderGit2,
-  Flame,
+  ChevronDown,
+  Layers,
+  Puzzle,
+  Users,
+  Crown,
+  ArrowRight,
 } from 'lucide-react';
 import { useProjectStore } from '../../stores/projectStore';
 import { useUiStore } from '../../stores/uiStore';
@@ -25,39 +29,47 @@ const navigationItems = [
   { name: 'Code Quality', href: '/quality', icon: ShieldCheck },
 ];
 
+const workspaceItems = [
+  { name: 'Projects', href: '/settings', icon: Layers },
+  { name: 'Integrations', href: '/settings', icon: Puzzle },
+  { name: 'Team', href: '/settings', icon: Users },
+  { name: 'Settings', href: '/settings', icon: Settings },
+];
+
 export const Sidebar: React.FC = () => {
   const { currentProject, projectSummary } = useProjectStore();
   const { sidebarOpen } = useUiStore();
+  const [workspaceOpen, setWorkspaceOpen] = useState(true);
 
   const cycleCount = projectSummary?.circular_cycles_count || 0;
   const unresolvedCount = projectSummary?.unresolved_dependencies_count || 0;
 
   return (
     <aside
-      className={`bg-bg-sidebar border-r border-border-subtle flex flex-col transition-all duration-200 z-20 select-none ${
-        sidebarOpen ? 'w-60' : 'w-16'
+      className={`bg-[#060b13]/95 backdrop-blur-xl border-r border-sky-500/10 flex flex-col transition-all duration-200 z-20 select-none ${
+        sidebarOpen ? 'w-64' : 'w-16'
       }`}
     >
       {/* Brand Header */}
-      <div className="h-14 flex items-center px-4 border-b border-border-subtle gap-3 bg-bg-secondary/40">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-blue/20 to-accent-cyan/10 border border-accent-blue/40 flex items-center justify-center text-accent-blue flex-shrink-0 shadow-md shadow-accent-blue/15">
-          <FolderGit2 className="w-4.5 h-4.5 text-accent-blue" />
+      <div className="h-16 flex items-center px-4 border-b border-sky-500/10 gap-3">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600/30 to-cyan-500/20 border border-sky-400/40 flex items-center justify-center text-sky-400 flex-shrink-0 shadow-lg shadow-sky-500/20 font-black tracking-tighter text-sm">
+          <span>Tm</span>
         </div>
         {sidebarOpen && (
           <div className="flex flex-col overflow-hidden">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm tracking-wide text-text-primary">TraceMap</span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-accent-blue/15 text-accent-blue border border-accent-blue/25">
-                PRO
+              <span className="font-bold text-sm tracking-wide text-white">TraceMap</span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-sky-500/20 text-sky-400 border border-sky-400/30">
+                Pro
               </span>
             </div>
-            <span className="text-[10px] text-text-muted font-mono tracking-wider">Code Intelligence</span>
+            <span className="text-[10px] text-slate-400 font-mono tracking-wider">Code Intelligence</span>
           </div>
         )}
       </div>
 
       {/* Main Navigation */}
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navigationItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -65,10 +77,10 @@ export const Sidebar: React.FC = () => {
               key={item.name}
               to={item.href}
               className={({ isActive }) =>
-                `flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                   isActive
-                    ? 'bg-accent-blue/15 text-accent-blue font-semibold border-l-2 border-accent-blue shadow-xs'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-panel/70'
+                    ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold shadow-lg shadow-sky-500/30'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                 }`
               }
               title={!sidebarOpen ? item.name : undefined}
@@ -79,50 +91,78 @@ export const Sidebar: React.FC = () => {
               </div>
 
               {sidebarOpen && item.href === '/circular' && cycleCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold font-mono bg-accent-red/20 text-accent-red border border-accent-red/30 animate-pulse">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse">
                   {cycleCount}
                 </span>
               )}
 
               {sidebarOpen && item.href === '/dependencies' && unresolvedCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold font-mono bg-accent-amber/20 text-accent-amber border border-accent-amber/30">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-500/20 text-amber-400 border border-amber-500/30">
                   {unresolvedCount}
                 </span>
               )}
             </NavLink>
           );
         })}
-      </nav>
 
-      {/* Bottom Settings & Project Label */}
-      <div className="p-3 border-t border-border-subtle space-y-2 bg-bg-secondary/30">
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-              isActive
-                ? 'bg-accent-blue/15 text-accent-blue font-semibold border-l-2 border-accent-blue'
-                : 'text-text-secondary hover:text-text-primary hover:bg-bg-panel/70'
-            }`
-          }
-          title={!sidebarOpen ? 'Settings' : undefined}
-        >
-          <Settings className="w-4 h-4 flex-shrink-0" />
-          {sidebarOpen && <span>Settings</span>}
-        </NavLink>
+        {/* Collapsible Workspace Section */}
+        {sidebarOpen && (
+          <div className="pt-5 pb-2">
+            <button
+              type="button"
+              onClick={() => setWorkspaceOpen(!workspaceOpen)}
+              className="w-full flex items-center justify-between px-3 text-[11px] font-semibold tracking-wider text-slate-500 uppercase hover:text-slate-300 transition-colors"
+            >
+              <span>Workspace</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${workspaceOpen ? 'rotate-0' : '-rotate-90'}`} />
+            </button>
 
-        {sidebarOpen && currentProject && (
-          <div className="p-2.5 bg-bg-panel/80 rounded-xl border border-border-subtle text-[11px] text-text-muted shadow-xs">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="w-2 h-2 rounded-full bg-accent-green animate-pulse" />
-              <span className="text-text-primary font-semibold truncate">{currentProject.name}</span>
-            </div>
-            <div className="text-[10px] font-mono truncate text-text-muted" title={currentProject.root_path}>
-              {currentProject.root_path}
-            </div>
+            {workspaceOpen && (
+              <div className="mt-2 space-y-0.5">
+                {workspaceItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.name}
+                      to={item.href}
+                      className="flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 transition-colors"
+                    >
+                      <Icon className="w-4 h-4 text-slate-400" />
+                      <span>{item.name}</span>
+                    </NavLink>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
-      </div>
+      </nav>
+
+      {/* Bottom Enterprise Card */}
+      {sidebarOpen && (
+        <div className="p-3">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0c1a30] via-[#091322] to-[#040812] border border-sky-500/20 p-3.5 shadow-xl">
+            {/* Ambient cyber glow */}
+            <div className="absolute -top-10 -right-10 w-24 h-24 bg-sky-500/20 rounded-full blur-xl pointer-events-none" />
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-5 h-5 rounded-md bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                <Crown className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-white tracking-wide">Enterprise Plan</span>
+            </div>
+            <p className="text-[11px] text-slate-400 leading-snug mb-3">
+              Advanced code intelligence for your organization.
+            </p>
+            <button
+              type="button"
+              className="w-full py-1.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-sky-500/20 transition-all"
+            >
+              <span>Manage Plan</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
     </aside>
   );
 };
