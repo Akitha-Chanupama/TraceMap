@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
@@ -9,6 +10,7 @@ from app.models.dependency import Dependency
 from app.analyzers.circular_dependencies import CircularDependencyAnalyzer
 from app.analyzers.impact_analysis import ImpactAnalyzer
 from app.analyzers.complexity import ComplexityAnalyzer
+from app.core.language_detector import detect_file_language
 from app.schemas.analysis import (
     AnalysisSummaryResponse,
     CircularDependenciesResponse,
@@ -39,7 +41,10 @@ class AnalysisService:
         # Language breakdown
         lang_map: Dict[str, int] = {}
         for f in files:
-            lang = f.language or "unknown"
+            lang = f.language
+            if not lang or lang == "unknown":
+                lang = detect_file_language(Path(f.relative_path))
+                f.language = lang
             lang_map[lang] = lang_map.get(lang, 0) + 1
 
         # File connectivity

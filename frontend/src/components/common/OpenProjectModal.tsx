@@ -66,6 +66,12 @@ export const OpenProjectModal: React.FC<OpenProjectModalProps> = ({ isOpen, onCl
   if (!isOpen) return null;
 
   const handleBrowseNative = async () => {
+    // Immediately open the interactive in-app folder navigator for instant visual feedback
+    setShowInAppBrowser(true);
+    if (!currentBrowserPath) {
+      fetchDirectory(pathInput || undefined);
+    }
+
     setIsBrowsingNative(true);
     setError(null);
     try {
@@ -76,11 +82,12 @@ export const OpenProjectModal: React.FC<OpenProjectModalProps> = ({ isOpen, onCl
           const parts = res.selected_path.replace(/\\/g, '/').split('/');
           setNameInput(parts[parts.length - 1] || 'My Project');
         }
+        setShowInAppBrowser(false);
       } else if (res.error) {
         setError(`Native dialog: ${res.error}. You can browse folders directly below or type the path.`);
       }
     } catch (err: any) {
-      setError(err.message || 'Could not launch native folder picker. Please use in-app browser or enter path.');
+      console.warn('Native folder dialog notice:', err);
     } finally {
       setIsBrowsingNative(false);
     }
@@ -177,8 +184,8 @@ export const OpenProjectModal: React.FC<OpenProjectModalProps> = ({ isOpen, onCl
                 type="button"
                 onClick={handleBrowseNative}
                 disabled={isBrowsingNative}
-                title="Launch Windows Folder Picker"
-                className="px-3 py-2 bg-bg-elevated hover:bg-border-subtle border border-border-subtle text-text-secondary hover:text-text-primary rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                title="Browse folders or launch Windows folder picker"
+                className="px-3 py-2 bg-accent-blue/15 hover:bg-accent-blue/25 border border-accent-blue/40 text-accent-blue rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
                 {isBrowsingNative ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -188,6 +195,37 @@ export const OpenProjectModal: React.FC<OpenProjectModalProps> = ({ isOpen, onCl
                 <span>Browse</span>
               </button>
             </div>
+
+            {/* Quick Drives Bar right below path input */}
+            {drives.length > 0 && !showInAppBrowser && (
+              <div className="flex items-center gap-1.5 pt-1 text-[11px]">
+                <span className="text-text-muted">Quick Drives:</span>
+                {drives.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => {
+                      setShowInAppBrowser(true);
+                      fetchDirectory(d);
+                    }}
+                    className="px-2 py-0.5 rounded bg-bg-elevated hover:bg-border-subtle border border-border-subtle text-text-secondary hover:text-accent-blue text-[11px] flex items-center gap-1 transition-colors font-mono"
+                  >
+                    <HardDrive className="w-3 h-3 text-accent-blue" />
+                    <span>{d}</span>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowInAppBrowser(true);
+                    if (!currentBrowserPath) fetchDirectory();
+                  }}
+                  className="text-accent-blue hover:underline ml-1 font-medium"
+                >
+                  Explore folders &rarr;
+                </button>
+              </div>
+            )}
             <p className="text-[11px] text-text-muted mt-1.5">
               Source files are read-only and analyzed on your local machine. Files are never modified or uploaded.
             </p>

@@ -39,3 +39,8 @@ def get_db():
 def init_db():
     import app.models  # Ensure all models are imported before creating tables
     Base.metadata.create_all(bind=engine)
+    try:
+        from app.db_migrations import run_startup_migrations
+        run_startup_migrations(engine)
+    except Exception as e:
+        pass

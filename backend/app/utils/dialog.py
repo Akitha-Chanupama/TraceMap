@@ -13,26 +13,25 @@ def open_folder_dialog() -> Optional[str]:
     """
     system = platform.system()
 
-    # 1. On Windows, try PowerShell FolderBrowserDialog with TopMost parent
+    # 1. On Windows, try PowerShell FolderBrowserDialog
     if system == "Windows":
         ps_script = (
-            "Add-Type -AssemblyName System.Windows.Forms; "
-            "$topForm = New-Object System.Windows.Forms.Form; "
-            "$topForm.TopMost = $true; "
+            "[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms') | Out-Null; "
             "$f = New-Object System.Windows.Forms.FolderBrowserDialog; "
             "$f.Description = 'Select Project Directory for TraceMap'; "
             "$f.ShowNewFolderButton = $true; "
-            "if ($f.ShowDialog($topForm) -eq [System.Windows.Forms.DialogResult]::OK) { "
-            "  Write-Output $f.SelectedPath "
+            "$f.RootFolder = [System.Environment+SpecialFolder]::MyComputer; "
+            "if ($f.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { "
+            "  [Console]::Out.Write($f.SelectedPath) "
             "} "
-            "$topForm.Dispose();"
+            "$f.Dispose();"
         )
         try:
             res = subprocess.run(
                 ["powershell", "-NoProfile", "-STA", "-Command", ps_script],
                 capture_output=True,
                 text=True,
-                timeout=180,
+                timeout=60,
             )
             out = res.stdout.strip()
             if out and os.path.isdir(out):

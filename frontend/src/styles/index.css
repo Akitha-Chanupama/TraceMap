@@ -33,30 +33,100 @@
   }
 
   body {
-    background-color: #0B0D12;
+    background: radial-gradient(circle at 80% 10%, rgba(14, 165, 233, 0.07) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                #060b13;
     color: #E8EDF5;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     user-select: none;
+    min-height: 100vh;
   }
 }
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0E1219;
+  background: #060b13;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #283244;
-  border-radius: 3px;
+  background: #1e293b;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3B4861;
+  background: #334155;
+}
+
+/* Glass & Glow Card Utilities */
+.glass-panel {
+  background: rgba(11, 19, 34, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.glass-panel-subtle {
+  background: rgba(8, 14, 26, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.08);
+}
+
+.glass-card-pro {
+  background: linear-gradient(135deg, rgba(13, 22, 39, 0.9) 0%, rgba(8, 14, 26, 0.85) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.16);
+  box-shadow: inset 0 1px 2px 0 rgba(255, 255, 255, 0.06), 0 12px 30px -8px rgba(0, 0, 0, 0.6);
+}
+
+.glow-card-blue {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-card-blue:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 8px 30px -4px rgba(14, 165, 233, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.glow-card-cyan {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-card-cyan:hover {
+  border-color: rgba(6, 182, 212, 0.45);
+  box-shadow: 0 8px 30px -4px rgba(6, 182, 212, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.glow-card-purple {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-card-purple:hover {
+  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: 0 8px 30px -4px rgba(168, 85, 247, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.glow-card-amber {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-card-amber:hover {
+  border-color: rgba(241, 184, 91, 0.45);
+  box-shadow: 0 4px 20px -2px rgba(241, 184, 91, 0.12);
+}
+
+.glow-card-red {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-card-red:hover {
+  border-color: rgba(239, 100, 100, 0.45);
+  box-shadow: 0 4px 20px -2px rgba(239, 100, 100, 0.12);
 }
 
 /* React Flow Dark Styling */
@@ -86,4 +156,3 @@
 .react-flow__attribution {
   display: none !important;
 }
-

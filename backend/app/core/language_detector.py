@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 
 
-LANGUAGE_EXTENSION_MAP = {
+LANGUAGE_EXTENSION_MAP: Dict[str, str] = {
+    # JavaScript & TypeScript
     ".js": "javascript",
     ".mjs": "javascript",
     ".cjs": "javascript",
@@ -12,14 +13,124 @@ LANGUAGE_EXTENSION_MAP = {
     ".mts": "typescript",
     ".cts": "typescript",
     ".tsx": "tsx",
+
+    # Python
     ".py": "python",
+    ".pyw": "python",
+    ".pyi": "python",
+
+    # PHP
+    ".php": "php",
+    ".phtml": "php",
+    ".php3": "php",
+    ".php4": "php",
+    ".php5": "php",
+    ".phps": "php",
+    ".inc": "php",
+
+    # Dart & Flutter
     ".dart": "dart",
+
+    # Java & Kotlin & Android
+    ".java": "java",
+    ".jsp": "java",
+    ".kt": "kotlin",
+    ".kts": "kotlin",
+    ".gradle": "gradle",
+
+    # Swift & Objective-C & iOS
+    ".swift": "swift",
+    ".m": "objective-c",
+    ".mm": "objective-c",
+    ".xcconfig": "xcconfig",
+    ".plist": "plist",
+
+    # C, C++, C#
+    ".c": "c",
+    ".h": "c",
+    ".cpp": "cpp",
+    ".cc": "cpp",
+    ".cxx": "cpp",
+    ".hpp": "cpp",
+    ".hh": "cpp",
+    ".hxx": "cpp",
+    ".cs": "csharp",
+    ".csx": "csharp",
+
+    # Go, Rust, Ruby
+    ".go": "go",
+    ".rs": "rust",
+    ".rb": "ruby",
+    ".erb": "ruby",
+    ".rake": "ruby",
+    ".gemspec": "ruby",
+
+    # Web & Styles
+    ".html": "html",
+    ".htm": "html",
+    ".css": "css",
+    ".scss": "scss",
+    ".sass": "sass",
+    ".less": "less",
+    ".vue": "vue",
+    ".svelte": "svelte",
+
+    # Database
+    ".sql": "sql",
+    ".psql": "sql",
+
+    # Shell & Scripts
+    ".sh": "shell",
+    ".bash": "shell",
+    ".zsh": "shell",
+    ".bat": "batch",
+    ".cmd": "batch",
+    ".ps1": "powershell",
+    ".psm1": "powershell",
+
+    # Config & Data Serialization
     ".json": "json",
+    ".json5": "json",
+    ".jsonc": "json",
     ".yaml": "yaml",
     ".yml": "yaml",
+    ".toml": "toml",
+    ".ini": "ini",
+    ".cfg": "config",
+    ".conf": "config",
+    ".properties": "properties",
+    ".xml": "xml",
+    ".proto": "protobuf",
+    ".graphql": "graphql",
+    ".gql": "graphql",
+    ".arb": "arb",
+
+    # Documentation & Text
     ".md": "markdown",
-    ".html": "html",
-    ".css": "css",
+    ".markdown": "markdown",
+    ".rst": "restructuredtext",
+    ".txt": "text",
+    ".csv": "csv",
+    ".tsv": "tsv",
+    ".svg": "svg",
+    ".cmake": "cmake",
+}
+
+SPECIAL_FILENAME_MAP: Dict[str, str] = {
+    "dockerfile": "dockerfile",
+    "makefile": "makefile",
+    "cmakelists.txt": "cmake",
+    "gemfile": "ruby",
+    "rakefile": "ruby",
+    "podfile": "ruby",
+    "brewfile": "ruby",
+    "jenkinsfile": "groovy",
+    "procfile": "yaml",
+    ".gitignore": "config",
+    ".gitattributes": "config",
+    ".editorconfig": "config",
+    ".env": "config",
+    ".env.example": "config",
 }
 
 SUPPORTED_CODE_LANGUAGES = {
@@ -29,10 +140,25 @@ SUPPORTED_CODE_LANGUAGES = {
     "tsx",
     "python",
     "dart",
+    "php",
+    "java",
+    "kotlin",
+    "swift",
+    "c",
+    "cpp",
+    "csharp",
+    "go",
+    "rust",
+    "ruby",
 }
 
 
 def detect_file_language(file_path: Path) -> str:
+    """Accurately detects source file language from extension or known filename."""
+    file_name = file_path.name.lower()
+    if file_name in SPECIAL_FILENAME_MAP:
+        return SPECIAL_FILENAME_MAP[file_name]
+
     ext = file_path.suffix.lower()
     return LANGUAGE_EXTENSION_MAP.get(ext, "unknown")
 
@@ -48,7 +174,7 @@ class ProjectDetector:
 
     def detect_project_info(self) -> Tuple[str, Dict[str, Any], Dict[str, Any]]:
         """
-        Analyzes configuration files in project root.
+        Analyzes configuration and source files in project root.
         Returns: (project_type, detected_frameworks_with_evidence, project_config)
         """
         frameworks: Dict[str, Any] = {}
@@ -93,7 +219,6 @@ class ProjectDetector:
             try:
                 with open(tsconfig, "r", encoding="utf-8") as f:
                     ts_content = f.read()
-                    # Strip basic comments if present
                     clean_lines = [l for l in ts_content.splitlines() if not l.strip().startswith("//")]
                     ts_data = json.loads("\n".join(clean_lines))
                     compiler_opts = ts_data.get("compilerOptions", {})
@@ -106,11 +231,56 @@ class ProjectDetector:
             except Exception:
                 pass
 
-        # 2. Check Python ecosystem
+        # 2. Check Dart/Flutter ecosystem
+        pubspec = self.root / "pubspec.yaml"
+        if pubspec.exists() or (self.root / "mobile_app" / "pubspec.yaml").exists():
+            project_types.append("Dart")
+            target_pubspec = pubspec if pubspec.exists() else (self.root / "mobile_app" / "pubspec.yaml")
+            try:
+                with open(target_pubspec, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+                    if "flutter:" in content or "sdk: flutter" in content:
+                        frameworks["Flutter"] = {"evidence": "pubspec.yaml flutter sdk dependency", "confidence": 1.0}
+            except Exception:
+                pass
+
+        # 3. Check PHP ecosystem
+        composer_json = self.root / "composer.json"
+        has_php = (
+            composer_json.exists()
+            or any(self.root.glob("*.php"))
+            or (self.root / "artisan").exists()
+            or any(self.root.glob("app/**/*.php"))
+        )
+        if has_php:
+            project_types.append("PHP")
+            if (self.root / "artisan").exists():
+                frameworks["Laravel"] = {"evidence": "artisan CLI found", "confidence": 1.0}
+            if composer_json.exists():
+                try:
+                    with open(composer_json, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        reqs = {**data.get("require", {}), **data.get("require-dev", {})}
+                        if "laravel/framework" in reqs:
+                            frameworks["Laravel"] = {"evidence": "composer.json require laravel/framework", "confidence": 1.0}
+                        if "symfony/framework-bundle" in reqs:
+                            frameworks["Symfony"] = {"evidence": "composer.json require symfony/framework-bundle", "confidence": 1.0}
+                        if "codeigniter4/framework" in reqs:
+                            frameworks["CodeIgniter"] = {"evidence": "CodeIgniter framework found", "confidence": 1.0}
+                except Exception:
+                    pass
+
+        # 4. Check Python ecosystem
         req_txt = self.root / "requirements.txt"
         pyproject = self.root / "pyproject.toml"
         setup_py = self.root / "setup.py"
-        if req_txt.exists() or pyproject.exists() or setup_py.exists() or any(self.root.glob("*.py")):
+        has_python = (
+            req_txt.exists()
+            or pyproject.exists()
+            or setup_py.exists()
+            or (any(self.root.glob("*.py")) and "PHP" not in project_types)
+        )
+        if has_python:
             project_types.append("Python")
             if req_txt.exists():
                 try:
@@ -125,18 +295,5 @@ class ProjectDetector:
                 except Exception:
                     pass
 
-        # 3. Check Dart/Flutter ecosystem
-        pubspec = self.root / "pubspec.yaml"
-        if pubspec.exists():
-            project_types.append("Dart")
-            try:
-                with open(pubspec, "r", encoding="utf-8", errors="ignore") as f:
-                    content = f.read()
-                    if "flutter:" in content or "sdk: flutter" in content:
-                        frameworks["Flutter"] = {"evidence": "pubspec.yaml flutter sdk dependency", "confidence": 1.0}
-            except Exception:
-                pass
-
-        final_project_type = " / ".join(dict.fromkeys(project_types)) if project_types else "Generic / Polyglot"
+        final_project_type = " / ".join(dict.fromkeys(project_types)) if project_types else "Polyglot"
         return final_project_type, frameworks, config_data
-

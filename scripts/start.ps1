@@ -34,7 +34,7 @@ $backendProcess = Start-Process `
 Write-Host ("  [+] Backend started - PID: " + $backendProcess.Id) -ForegroundColor Green
 
 # 2. Start Frontend
-Write-Host "[2/3] Launching Vite frontend on localhost:5173..." -ForegroundColor Yellow
+Write-Host "[2/3] Launching Vite frontend on localhost:5175..." -ForegroundColor Yellow
 $frontendProcess = Start-Process `
     -FilePath "cmd.exe" `
     -ArgumentList "/c", "npm run dev --prefix frontend" `
@@ -66,11 +66,11 @@ for ($i = 0; $i -lt 15; $i++) {
 if ($ready) {
     Write-Host "`n==========================================" -ForegroundColor Green
     Write-Host "  TraceMap is Live!                       " -ForegroundColor Green
-    Write-Host "  Frontend: http://localhost:5173         " -ForegroundColor Cyan
+    Write-Host "  Frontend: http://localhost:5175         " -ForegroundColor Cyan
     Write-Host "  Backend:  http://127.0.0.1:8000/docs    " -ForegroundColor Cyan
     Write-Host "  To stop TraceMap, run:                  " -ForegroundColor White
     Write-Host "    .\scripts\stop.ps1                    " -ForegroundColor White
     Write-Host "==========================================" -ForegroundColor Green
 } else {
-    Write-Warning "Backend is still starting. Check http://localhost:5173 shortly."
+    Write-Warning "Backend is still starting. Check http://localhost:5175 shortly."
 }

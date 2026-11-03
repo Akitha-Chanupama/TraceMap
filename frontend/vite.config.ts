@@ -11,8 +11,12 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: 5175,
     host: '127.0.0.1',
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      'Clear-Site-Data': '"cache"',
+    },
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',
@@ -22,4 +26,3 @@ export default defineConfig({
     },
   },
 });
-
